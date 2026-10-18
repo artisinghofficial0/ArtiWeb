@@ -1380,6 +1380,275 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Modal: Add Slide */}
+              {newSlideOpen && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+                  <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 border border-slate-200 dark:border-slate-700 shadow-2xl my-8 space-y-4 max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                      <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                        <Plus className="w-4 h-4 text-sky-600" />
+                        <span>Add Slide to Hero Showcase</span>
+                      </h3>
+                      <button
+                        onClick={() => setNewSlideOpen(false)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!newSlideForm.title.trim()) return;
+                        addHeroSlide({
+                          productId: newSlideForm.productId,
+                          productSlug: newSlideForm.productSlug,
+                          badge: newSlideForm.badge.trim() || 'Featured Special',
+                          title: newSlideForm.title.trim(),
+                          subtitle: newSlideForm.subtitle.trim(),
+                          image: newSlideForm.image.trim() || products[0]?.thumbnail || '',
+                          authorizedPrice: Number(newSlideForm.authorizedPrice) || 1000,
+                          originalPrice: newSlideForm.originalPrice ? Number(newSlideForm.originalPrice) : undefined,
+                          isOffer: newSlideForm.isOffer,
+                          offerTag: newSlideForm.offerTag.trim() || undefined,
+                          highlightPoints: [
+                            newSlideForm.highlight1.trim() || '100% Genuine Atomy',
+                            newSlideForm.highlight2.trim() || 'Korean Biotech Quality',
+                            newSlideForm.highlight3.trim() || 'Distributor Direct',
+                          ],
+                        });
+                        setNewSlideOpen(false);
+                      }}
+                      className="space-y-3 text-xs"
+                    >
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Pick from Catalog (Optional Auto-Fill)
+                        </label>
+                        <select
+                          value={newSlideForm.productId}
+                          onChange={(e) => {
+                            const p = products.find((prod) => prod.id === e.target.value);
+                            if (p) {
+                              setNewSlideForm({
+                                ...newSlideForm,
+                                productId: p.id,
+                                productSlug: p.slug || 'catalogue',
+                                title: p.name,
+                                subtitle: p.shortDescription || 'Authentic Korean skincare and wellness.',
+                                image: p.thumbnail,
+                                authorizedPrice: p.authorizedPrice,
+                                originalPrice: p.originalPrice || Math.round(p.authorizedPrice * 1.15),
+                                badge: p.badge || 'Bestseller Special',
+                              });
+                            }
+                          }}
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        >
+                          <option value="">-- Choose a Product --</option>
+                          {products.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name} (₹{p.authorizedPrice})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Slide Title *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={newSlideForm.title}
+                          onChange={(e) => setNewSlideForm({ ...newSlideForm, title: e.target.value })}
+                          placeholder="e.g. Atomy Absolute Skincare Set"
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Badge Tag
+                          </label>
+                          <input
+                            type="text"
+                            value={newSlideForm.badge}
+                            onChange={(e) => setNewSlideForm({ ...newSlideForm, badge: e.target.value })}
+                            placeholder="e.g. FLAGSHIP PRESTIGE"
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Price (₹) *
+                          </label>
+                          <input
+                            type="number"
+                            required
+                            value={newSlideForm.authorizedPrice}
+                            onChange={(e) => setNewSlideForm({ ...newSlideForm, authorizedPrice: Number(e.target.value) })}
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Subtitle / Brief Pitch
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={newSlideForm.subtitle}
+                          onChange={(e) => setNewSlideForm({ ...newSlideForm, subtitle: e.target.value })}
+                          placeholder="Brief description..."
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Product Image URL
+                        </label>
+                        <input
+                          type="text"
+                          value={newSlideForm.image}
+                          onChange={(e) => setNewSlideForm({ ...newSlideForm, image: e.target.value })}
+                          placeholder="https://... or /products/..."
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <button
+                          type="button"
+                          onClick={() => setNewSlideOpen(false)}
+                          className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold cursor-pointer"
+                        >
+                          Save Slide
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Modal: Edit Slide */}
+              {editingSlide && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+                  <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 border border-slate-200 dark:border-slate-700 shadow-2xl my-8 space-y-4 max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                      <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                        <Edit2 className="w-4 h-4 text-sky-600" />
+                        <span>Edit Slide</span>
+                      </h3>
+                      <button
+                        onClick={() => setEditingSlide(null)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        updateHeroSlide(editingSlide.id, editingSlide);
+                        setEditingSlide(null);
+                      }}
+                      className="space-y-3 text-xs"
+                    >
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Slide Title *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={editingSlide.title}
+                          onChange={(e) => setEditingSlide({ ...editingSlide, title: e.target.value })}
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Badge Tag
+                          </label>
+                          <input
+                            type="text"
+                            value={editingSlide.badge}
+                            onChange={(e) => setEditingSlide({ ...editingSlide, badge: e.target.value })}
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Price (₹)
+                          </label>
+                          <input
+                            type="number"
+                            value={editingSlide.authorizedPrice}
+                            onChange={(e) => setEditingSlide({ ...editingSlide, authorizedPrice: Number(e.target.value) })}
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Subtitle
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={editingSlide.subtitle}
+                          onChange={(e) => setEditingSlide({ ...editingSlide, subtitle: e.target.value })}
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Image URL
+                        </label>
+                        <input
+                          type="text"
+                          value={editingSlide.image}
+                          onChange={(e) => setEditingSlide({ ...editingSlide, image: e.target.value })}
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <button
+                          type="button"
+                          onClick={() => setEditingSlide(null)}
+                          className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold cursor-pointer"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1442,6 +1711,151 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Modal: Create Offer */}
+              {newOfferOpen && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+                  <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 border border-slate-200 dark:border-slate-700 shadow-2xl my-8 space-y-4 max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                      <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                        <Plus className="w-4 h-4 text-sky-600" />
+                        <span>Create Special Offer / Bundle</span>
+                      </h3>
+                      <button
+                        onClick={() => setNewOfferOpen(false)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleAddOfferSubmit} className="space-y-3 text-xs">
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Select Product *
+                        </label>
+                        <select
+                          value={newOfferForm.productId}
+                          onChange={(e) => {
+                            const p = products.find((prod) => prod.id === e.target.value);
+                            setNewOfferForm({
+                              ...newOfferForm,
+                              productId: e.target.value,
+                              title: p ? `${p.name} Special Promotion` : '',
+                              authorizedOriginalPrice: p ? (p.originalPrice || Math.round(p.authorizedPrice * 1.15)) : 15000,
+                              authorizedOfferPrice: p ? p.authorizedPrice : 13500,
+                            });
+                          }}
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          required
+                        >
+                          <option value="">-- Choose a Product --</option>
+                          {products.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name} (₹{p.authorizedPrice})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Offer Headline *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={newOfferForm.title}
+                          onChange={(e) => setNewOfferForm({ ...newOfferForm, title: e.target.value })}
+                          placeholder="e.g. Festive Korean Glow Bundle"
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Original MRP (₹)
+                          </label>
+                          <input
+                            type="number"
+                            value={newOfferForm.authorizedOriginalPrice}
+                            onChange={(e) => setNewOfferForm({ ...newOfferForm, authorizedOriginalPrice: Number(e.target.value) })}
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Offer / Discounted Rate (₹) *
+                          </label>
+                          <input
+                            type="number"
+                            required
+                            value={newOfferForm.authorizedOfferPrice}
+                            onChange={(e) => setNewOfferForm({ ...newOfferForm, authorizedOfferPrice: Number(e.target.value) })}
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Banner Tag
+                          </label>
+                          <input
+                            type="text"
+                            value={newOfferForm.bannerTag}
+                            onChange={(e) => setNewOfferForm({ ...newOfferForm, bannerTag: e.target.value })}
+                            placeholder="e.g. SEASONAL EXCLUSIVE"
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Valid Until
+                          </label>
+                          <input
+                            type="date"
+                            value={newOfferForm.endAt}
+                            onChange={(e) => setNewOfferForm({ ...newOfferForm, endAt: e.target.value })}
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                          Offer Description / Highlights
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={newOfferForm.description}
+                          onChange={(e) => setNewOfferForm({ ...newOfferForm, description: e.target.value })}
+                          placeholder="e.g. Free distributor consultation and travel kit included..."
+                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <button
+                          type="button"
+                          onClick={() => setNewOfferOpen(false)}
+                          className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold cursor-pointer"
+                        >
+                          Publish Offer
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
