@@ -1,0 +1,6 @@
+{
+  "name": "Atomy India - Aarti Singh Independent Distributor",
+  "description": "Premium Atomy Korean skincare, health, and personal care products discovery, catalogue, and WhatsApp enquiry portal for Aarti Singh, Independent Distributor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
